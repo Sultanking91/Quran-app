@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>رحلة مع القرآن</title>
+<meta name="theme-color" content="#0b1622">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="رحلة قرآن">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="icon" href="./icon-192.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700&display=swap');
+
+  :root{
+    --night-deep: #0b1622;
+    --night-mid: #12233a;
+    --night-soft: #1a2f4c;
+    --gold: #c9a86a;
+    --gold-soft: #8a7550;
+    --ivory: #ece6d8;
+    --ivory-dim: #a9a89c;
+    --green: #7fae8f;
+    --line: rgba(201,168,106,0.18);
+  }
+
+  *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+  html,body{
+    margin:0; padding:0; min-height:100vh;
+    background:
+      radial-gradient(ellipse at 50% -10%, var(--night-soft) 0%, var(--night-mid) 45%, var(--night-deep) 100%);
+    color:var(--ivory);
+    font-family:'Tajawal', sans-serif;
+    overflow-x:hidden;
+    -webkit-user-select:none; user-select:none;
+  }
+
+  .stars{
+    position:fixed; inset:0; pointer-events:none; opacity:0.35;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, var(--gold) 0, transparent 60%),
+      radial-gradient(1px 1px at 80% 15%, var(--gold) 0, transparent 60%),
+      radial-gradient(1.5px 1.5px at 60% 70%, var(--gold) 0, transparent 60%),
+      radial-gradient(1px 1px at 25% 80%, var(--gold) 0, transparent 60%),
+      radial-gradient(1px 1px at 90% 60%, var(--gold) 0, transparent 60%),
+      radial-gradient(1.5px 1.5px at 40% 40%, var(--gold) 0, transparent 60%);
+    background-size: 100% 100%;
+  }
+
+  .wrap{
+    position:relative;
+    min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding: max(28px, env(safe-area-inset-top)) 20px max(28px, env(safe-area-inset-bottom));
+    gap:22px;
+  }
+
+  .ring{
+    position:relative;
+    width:96px; height:96px;
+  }
+  .ring svg{ width:100%; height:100%; transform:rotate(-90deg); }
+  .ring circle{ fill:none; stroke-linecap:round; }
+  .ring .bg{ stroke:rgba(201,168,106,0.15); stroke-width:3; }
+  .ring .fg{ stroke:var(--gold); stroke-width:3; transition: stroke-dashoffset 0.4s linear; }
+  .ring .center{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-size:20px; color:var(--gold);
+  }
+
+  .eyebrow{
+    letter-spacing:1.5px; font-size:12px; color:var(--gold-soft);
+    font-weight:500; text-align:center;
+  }
+
+  .surah-name{
+    font-family:'Amiri', serif; font-size:24px; color:var(--gold);
+    margin:2px 0 0; text-align:center;
+  }
+
+  .divider{
+    width:60px; height:1px; background:linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity:0.7;
+  }
+
+  .card{
+    max-width:640px; width:100%;
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:40px 28px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+    text-align:center;
+    min-height:120px;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  .ayah-text{
+    font-family:'Amiri', serif;
+    font-size:clamp(22px, 4.4vw, 32px);
+    line-height:2.15;
+    color:var(--ivory);
+  }
+
+  .ayah-meta{
+    font-size:13px; color:var(--ivory-dim); letter-spacing:0.5px;
+  }
+
+  .confirm-zone{
+    display:flex; flex-direction:column; align-items:center; gap:14px;
+    margin-top:4px;
+  }
+
+  .confirm-btn{
+    font-family:'Tajawal', sans-serif;
+    font-size:15px; font-weight:700;
+    color:var(--night-deep);
+    background: var(--gold);
+    border:none; border-radius:999px;
+    padding:13px 34px;
+    cursor:pointer;
+    letter-spacing:0.5px;
+    box-shadow: 0 4px 18px rgba(201,168,106,0.25);
+    transition: transform 0.15s ease, opacity 0.3s ease;
+  }
+  .confirm-btn:active{ transform: scale(0.96); }
+
+  .confirm-hint{
+    font-size:12px; color:var(--ivory-dim); letter-spacing:0.5px;
+  }
+
+  .done-state{
+    display:none; flex-direction:column; align-items:center; gap:8px;
+    text-align:center;
+  }
+  .done-check{
+    font-size:26px; color:var(--green);
+  }
+  .done-text{
+    font-family:'Amiri', serif; font-size:16px; color:var(--ivory);
+  }
+  .done-sub{
+    font-size:12px; color:var(--ivory-dim);
+  }
+
+  .loading{ font-size:14px; color:var(--ivory-dim); }
+
+  .footer{
+    position:fixed; bottom:max(14px, env(safe-area-inset-bottom)); left:0; right:0;
+    display:flex; justify-content:center;
+  }
+  .reset-btn{
+    font-family:'Tajawal', sans-serif;
+    font-size:11px; color:var(--ivory-dim);
+    background:none; border:none; cursor:pointer;
+    opacity:0.4; letter-spacing:1px;
+    padding:6px 12px;
+  }
+  .reset-btn:active{ opacity:0.85; color:var(--gold); }
+
+  .install-banner{
+    display:none;
+    position:fixed; top:max(14px, env(safe-area-inset-top)); left:16px; right:16px;
+    background: var(--night-soft); border:1px solid var(--line); border-radius:10px;
+    padding:12px 16px; font-size:12px; color:var(--ivory-dim);
+    text-align:center; z-index:10;
+  }
+
+  @media (max-width:480px){
+    .card{ padding:30px 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<div class="install-banner" id="installBanner">اضغط زر المشاركة ثم "إضافة إلى الشاشة الرئيسية" لتثبيت التطبيق</div>
+
+<div class="wrap" id="app">
+  <div class="ring">
+    <svg viewBox="0 0 40 40">
+      <circle class="bg" cx="20" cy="20" r="17.5"></circle>
+      <circle class="fg" id="ringFg" cx="20" cy="20" r="17.5" stroke-dasharray="110" stroke-dashoffset="0"></circle>
+    </svg>
+    <div class="center" id="ringCenter">☾</div>
+  </div>
+
+  <div>
+    <div class="eyebrow" id="eyebrow">جاري التحميل…</div>
+    <div class="surah-name" id="surahName">&nbsp;</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="card">
+    <div class="loading" id="loadingMsg">...يفتح المصحف</div>
+    <div class="ayah-text" id="ayahText" style="display:none;"></div>
+  </div>
+
+  <div class="ayah-meta" id="ayahMeta"></div>
+
+  <div class="confirm-zone" id="confirmZone" style="display:none;">
+    <button class="confirm-btn" id="confirmBtn">✓ قريتها</button>
+    <div class="confirm-hint" id="confirmHint"></div>
+  </div>
+
+  <div class="done-state" id="doneState">
+    <div class="done-check">✓</div>
+    <div class="done-text">تقبّل الله، انتهيت من هذه الآية</div>
+    <div class="done-sub">افتح التطبيق مرة ثانية لتظهر لك الآية التالية</div>
+  </div>
+</div>
+
+<div class="footer">
+  <button class="reset-btn" id="resetBtn">إعادة البدء من الفاتحة ↺</button>
+</div>
+
+<script>
+const STORAGE_KEY = 'quran-progress-v2';
+const TOTAL_AYAHS = 6236;
+const CONFIRM_SECONDS = 60;
+const RING_CIRC = 110;
+
+const FALLBACK_FATIHA = [
+  { text: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ", surah: "سورة الفاتحة", numberInSurah: 1 },
+  { text: "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ", surah: "سورة الفاتحة", numberInSurah: 2 },
+  { text: "الرَّحْمَٰنِ الرَّحِيمِ", surah: "سورة الفاتحة", numberInSurah: 3 },
+  { text: "مَالِكِ يَوْمِ الدِّينِ", surah: "سورة الفاتحة", numberInSurah: 4 },
+  { text: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ", surah: "سورة الفاتحة", numberInSurah: 5 },
+  { text: "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ", surah: "سورة الفاتحة", numberInSurah: 6 },
+  { text: "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ", surah: "سورة الفاتحة", numberInSurah: 7 }
+];
+
+function loadProgress(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return null;
+}
+function saveProgress(data){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){}
+}
+
+async function fetchAyah(number){
+  if(number <= 7) return FALLBACK_FATIHA[number - 1];
+  try{
+    const res = await fetch(`https://api.alquran.cloud/v1/ayah/${number}/quran-uthmani`);
+    const json = await res.json();
+    if(json && json.data){
+      return {
+        text: json.data.text,
+        surah: json.data.surah.name,
+        numberInSurah: json.data.numberInSurah
+      };
+    }
+  }catch(e){ console.error(e); }
+  return { text: "تعذّر تحميل الآية، تحقق من الاتصال بالإنترنت وأعد المحاولة.", surah: "", numberInSurah: number };
+}
+
+function setRing(fraction){
+  const offset = RING_CIRC - (fraction * RING_CIRC);
+  document.getElementById('ringFg').style.strokeDashoffset = offset;
+}
+
+let timerInterval = null;
+
+function startConfirmFlow(ayahNumber){
+  const confirmZone = document.getElementById('confirmZone');
+  const doneState = document.getElementById('doneState');
+  const confirmBtn = document.getElementById('confirmBtn');
+  const confirmHint = document.getElementById('confirmHint');
+  const ringCenter = document.getElementById('ringCenter');
+
+  confirmZone.style.display = 'flex';
+  doneState.style.display = 'none';
+  ringCenter.textContent = '☾';
+  setRing(0);
+
+  let elapsed = 0;
+  confirmHint.textContent = `تتأكد قراءتها تلقائيًا خلال ${CONFIRM_SECONDS} ثانية`;
+
+  function finish(){
+    clearInterval(timerInterval);
+    saveProgress({ ayahNumber, confirmed: true });
+    confirmZone.style.display = 'none';
+    doneState.style.display = 'flex';
+    ringCenter.textContent = '✓';
+    setRing(1);
+  }
+
+  timerInterval = setInterval(() => {
+    elapsed += 1;
+    setRing(elapsed / CONFIRM_SECONDS);
+    const remaining = CONFIRM_SECONDS - elapsed;
+    if(remaining > 0){
+      confirmHint.textContent = `تتأكد قراءتها تلقائيًا خلال ${remaining} ثانية`;
+    }
+    if(elapsed >= CONFIRM_SECONDS){
+      finish();
+    }
+  }, 1000);
+
+  confirmBtn.onclick = finish;
+}
+
+async function init(){
+  const progress = loadProgress();
+  let ayahNumber;
+  let justCompleted = false;
+
+  if(!progress){
+    ayahNumber = 1;
+  } else if(progress.confirmed){
+    ayahNumber = progress.ayahNumber + 1;
+    if(ayahNumber > TOTAL_AYAHS){ ayahNumber = 1; justCompleted = true; }
+  } else {
+    ayahNumber = progress.ayahNumber;
+  }
+
+  saveProgress({ ayahNumber, confirmed: false });
+
+  const ayah = await fetchAyah(ayahNumber);
+
+  document.getElementById('loadingMsg').style.display = 'none';
+  const ayahTextEl = document.getElementById('ayahText');
+  ayahTextEl.style.display = 'block';
+  ayahTextEl.textContent = ayah.text;
+
+  document.getElementById('surahName').textContent = ayah.surah || '';
+  document.getElementById('eyebrow').textContent = justCompleted
+    ? "ختمتَ القرآن كاملًا، والرحلة تبدأ من جديد ✦"
+    : `آية ${ayahNumber} من ${TOTAL_AYAHS}`;
+  document.getElementById('ayahMeta').textContent = ayah.numberInSurah
+    ? `آية ${ayah.numberInSurah} من ${ayah.surah}`
+    : '';
+
+  startConfirmFlow(ayahNumber);
+}
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if(confirm('هل تريد إعادة البدء من أول آية في سورة الفاتحة؟')){
+    localStorage.removeItem(STORAGE_KEY);
+    if(timerInterval) clearInterval(timerInterval);
+    location.reload();
+  }
+});
+
+// Register service worker for offline app-shell support
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+  });
+}
+
+// Show an install hint on iOS Safari (no native install prompt there)
+(function(){
+  const isIOS = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+  const isStandalone = window.navigator.standalone === true;
+  if(isIOS && !isStandalone){
+    document.getElementById('installBanner').style.display = 'block';
+  }
+})();
+
+init();
+</script>
+</body>
+</html>
